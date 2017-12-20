@@ -65,11 +65,12 @@ def redraw():
     uuid_a = str(uuid.uuid4())
     accesstoken_a = kirara_api.signup(uuid_a,name)
     kirara_api.login(uuid_a,accesstoken_a)
+    kirara_api.present_get()
     move_get_flag = True
 
-    kirara_api._make_request(
-        "/api/player/gacha/draw", 
-        {"gachaId":1,"drawType":3,"stepCode":0,"reDraw":True},True)
+    #kirara_api._make_request(
+    #    "/api/player/gacha/draw", 
+    #    {"gachaId":1,"drawType":3,"stepCode":0,"reDraw":True},True)
 
     while True:
         r = kirara_api._make_request(
@@ -84,6 +85,7 @@ def redraw():
             print("session invalid")
         time.sleep(1+random.uniform(1, 2))
 
+    kirara_api.tutorial_step()
     print("UUID: %s, TOKEN: %s" % (uuid_a,accesstoken_a))
     # new id move get
     if move_get_flag:
