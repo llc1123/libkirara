@@ -78,7 +78,7 @@ class KiraraAPI:
             resultStr = self._make_request2('/api/app/version/get', {'platform': PLATFORM, 'version': VERSION}, post=False)
             logger.info(str(resultStr))
             result = json.loads(resultStr)
-            assert result['resultCode'] == 0
+            self._assert_result(result)
             self.headers['X-STAR-AB'] = str(result['abVer'])
         return self._make_request2(api, data, post)
     
@@ -119,6 +119,10 @@ class KiraraAPI:
             r = self.session.get(url, params=data, headers=headers)
         return r.content
     
+    def _assert_result(self, result, accepting=[0]):
+        if result['resultCode'] not in accepting:
+            raise KiraraException('ResultCode: ' + str(result['resultCode']))
+
     def signup(self, uuid, name):
         resultStr = self._make_request("/api/player/signup", {
             "uuid": uuid,
@@ -127,7 +131,7 @@ class KiraraAPI:
             "stepCode":1
         },True)
         result = json.loads(resultStr)
-        assert result['resultCode'] == 0
+        self._assert_result(result)
         return result['accessToken']
     
     def login(self, uuid, access_token):
@@ -140,7 +144,7 @@ class KiraraAPI:
         }, True)
         logger.info(str(resultStr))
         result = json.loads(resultStr)
-        assert result['resultCode'] == 0
+        self._assert_result(result)
         self.session_id = result['sessionId']
     
     def move_get(self, password):
@@ -149,7 +153,7 @@ class KiraraAPI:
         }, True)
         logger.info(str(resultStr))
         result = json.loads(resultStr)
-        assert result['resultCode'] == 0
+        self._assert_result(result)
         return result['moveCode']
     
     def move_set(self, move_code, password, uuid):
@@ -161,7 +165,7 @@ class KiraraAPI:
         }, True)
         logger.info(str(resultStr))
         result = json.loads(resultStr)
-        assert result['resultCode'] == 0
+        self._assert_result(result)
         return result['accessToken']
     
     def age_set(self, age):
@@ -170,30 +174,30 @@ class KiraraAPI:
         }, True)
         logger.info(str(resultStr))
         result = json.loads(resultStr)
-        assert result['resultCode'] == 0
+        self._assert_result(result)
         return True
     
     def mission_get(self):
         resultStr = self._make_request('/api/player/mission/get_all', {}, False)
         logger.info(str(resultStr))
         result = json.loads(resultStr)
-        assert result['resultCode'] == 0
+        self._assert_result(result)
         return result
     
     def mission_set(self, mission_dict):
         resultStr = self._make_request('/api/player/mission/set', mission_dict, True)
         logger.info(str(resultStr))
         result = json.loads(resultStr)
-        assert result['resultCode'] == 0
+        self._assert_result(result)
         return result
     
     def mission_complete(self, mission_dict):
         resultStr = self._make_request('/api/player/mission/complete', mission_dict, True)
         logger.info(str(resultStr))
         result = json.loads(resultStr)
-        # assert result['resultCode'] == 0
+        self._assert_result(result, [0, 510])
         return result
-    
+
     def quests_data_unpack(self, q_data):
         step_0 = base64.b64decode(q_data)
         return json.loads("{%s}" % zlib.decompress(step_0).decode("UTF-8"))
@@ -201,3 +205,6 @@ class KiraraAPI:
     def quests_data_pack(self, q_data):
         q = zlib.compress(json.dumps(q_data)[1:-1].encode("UTF-8"))
         return base64.b64encode(q).decode("UTF-8")
+
+class KiraraException(Exception):
+    pass
