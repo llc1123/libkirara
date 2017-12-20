@@ -3,6 +3,7 @@ import requests
 import json
 import hashlib
 import logging
+import urllib.parse
 # UNPACK A.D
 try:
     from Crypto.Cipher import AES
@@ -103,6 +104,8 @@ class KiraraAPI:
             headers['Content-Length'] = str(len(datastr.encode()))
             headers['Content-Type'] = 'application/json; charset=UTF-8'
 
+        if not post:
+            api += '?' + urllib.parse.urlencode(data)
         bstring = api
         if 'X-STAR-SESSION-ID' in headers:
             bstring = headers['X-STAR-SESSION-ID'] + ' ' + bstring
@@ -119,7 +122,7 @@ class KiraraAPI:
         if post:
             r = self.session.post(url, headers=headers, data=datastr.encode())
         else:
-            r = self.session.get(url, params=data, headers=headers)
+            r = self.session.get(url, headers=headers)
         return r.content
     
     def _assert_result(self, result, accepting=[0]):
