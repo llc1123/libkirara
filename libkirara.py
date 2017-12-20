@@ -104,9 +104,12 @@ class KiraraAPI:
             headers['Content-Length'] = str(len(datastr.encode()))
             headers['Content-Type'] = 'application/json; charset=UTF-8'
 
+        path = api
         if not post:
-            api += '?' + urllib.parse.urlencode(data)
-        bstring = api
+            qs = urllib.parse.urlencode(data)
+            if len(qs) > 0:
+                path += '?' + qs
+        bstring = path
         if 'X-STAR-SESSION-ID' in headers:
             bstring = headers['X-STAR-SESSION-ID'] + ' ' + bstring
         if post:
@@ -117,7 +120,7 @@ class KiraraAPI:
         requestHash = sha.hexdigest()
         headers['X-STAR-REQUESTHASH'] = requestHash
 
-        url = 'https://krr-prd.star-api.com' + api
+        url = 'https://krr-prd.star-api.com' + path
         r = None
         if post:
             r = self.session.post(url, headers=headers, data=datastr.encode())
