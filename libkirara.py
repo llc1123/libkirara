@@ -89,16 +89,12 @@ class KiraraAPI:
     def _make_request2(self, api, data, post):
         REQUESTHASH_SECRET = "85af4a94ce7a280f69844743212a8b867206ab28946e1e30e6c1a10196609a11"
         headers = dict(self.headers)
+        datastr = json.dumps(data, separators=(',', ':'))
+
         if self.session_id is not None:
             headers['X-STAR-SESSION-ID'] = self.session_id
         elif 'X-STAR-SESSION-ID' in headers:
             del headers['X-STAR-SESSION-ID']
-
-        datastr = ''
-        for k in data:
-            v = data[k]
-            datastr += f'\"{k}\":{json.dumps(v)},'
-        datastr = f'{{{datastr[:-1]}}}'
 
         if post:
             headers['Content-Length'] = str(len(datastr.encode()))
