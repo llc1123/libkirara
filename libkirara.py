@@ -152,6 +152,16 @@ class KiraraAPI:
         result = json.loads(resultStr)
         self._assert_result(result)
         self.session_id = result['sessionId']
+
+    def present_get(self):
+            resultStr = self._make_request('/api/player/present/get_all', {}, False)
+            logger.info(str(resultStr))
+
+    def tutorial_step(self, stepCode=-1):
+            resultStr = self._make_request('/api/player/tutorial/step/add', {
+                "stepCode": stepCode
+            }, True)
+            logger.info(str(resultStr))
     
     def move_get(self, password):
         resultStr = self._make_request('/api/player/move/get', {
