@@ -84,7 +84,7 @@ while True:
         print("session invalid")
     time.sleep(1+random.uniform(1, 2))
 
+print("UUID: %s, TOKEN: %s" % (uuid_a,accesstoken_a))
 # new id move get
 if move_get_flag:
-    print("UUID: %s, TOKEN: %s" % (uuid_a,accesstoken_a))
     print("MoveCode: %s" % kirara_api.move_get("kirara"))
