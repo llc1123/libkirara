@@ -4,7 +4,10 @@ import json
 import hashlib
 import logging
 # UNPACK A.D
-from Crypto.Cipher import AES
+try:
+    from Crypto.Cipher import AES
+except BaseException:
+    print('WARNING: pycrypto not found, cannot read a.d file')
 import struct
 # UNPACK Quests data
 import base64
