@@ -1,6 +1,8 @@
 import time
 import json
 import libkirara
+import logging
+logger = logging.getLogger('redraw')
 
 def check_count(r: dict):
     cid_map = {
@@ -25,7 +27,7 @@ def check_count(r: dict):
         if type == 50:
             result_json["gold"] += 1
             CID.append(item["characterId"])
-            logging.info("CID: %d" % item["characterId"])
+            logger.info("CID: %d" % item["characterId"])
         if type == 40:
             result_json["silver"] += 1
         if type == 30:
