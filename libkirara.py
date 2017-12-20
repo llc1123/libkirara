@@ -6,6 +6,9 @@ import logging
 # UNPACK A.D
 from Crypto.Cipher import AES
 import struct
+# UNPACK Quests data
+import base64
+import zlib
 
 PLATFORM = 2 # android
 VERSION = '1.0.3'
@@ -191,3 +194,10 @@ class KiraraAPI:
         # assert result['resultCode'] == 0
         return result
     
+    def quests_data_unpack(self, q_data):
+        step_0 = base64.b64decode(q_data)
+        return json.loads("{%s}" % zlib.decompress(step_0).decode("UTF-8"))
+
+    def quests_data_pack(self, q_data):
+        q = zlib.compress(json.dumps(q_data)[1:-1].encode("UTF-8"))
+        return base64.b64encode(q).decode("UTF-8")
