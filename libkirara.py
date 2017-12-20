@@ -60,6 +60,10 @@ class KiraraAPI:
             parse_data(data)
         return self.user_account
     
+    def load_account_and_login(self, path="a.d"):
+        self.load_account(path)
+        self.login(kirara_api.user_account["uuid"],kirara_api.user_account["accesstoken"])
+
     def set_user_agent(self, user_agent):
         self.headers['User-Agent'] = user_agent
     
