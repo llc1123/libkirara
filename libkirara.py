@@ -174,5 +174,20 @@ class KiraraAPI:
         resultStr = self._make_request('/api/player/mission/get_all', {}, False)
         logger.info(str(resultStr))
         result = json.loads(resultStr)
+        assert result['resultCode'] == 0
+        return result
+    
+    def mission_set(self, mission_dict):
+        resultStr = self._make_request('/api/player/mission/set', mission_dict, True)
+        logger.info(str(resultStr))
+        result = json.loads(resultStr)
+        assert result['resultCode'] == 0
+        return result
+    
+    def mission_complete(self, mission_dict):
+        resultStr = self._make_request('/api/player/mission/complete', mission_dict, True)
+        logger.info(str(resultStr))
+        result = json.loads(resultStr)
         # assert result['resultCode'] == 0
         return result
+    
