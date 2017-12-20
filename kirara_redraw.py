@@ -1,8 +1,13 @@
 import time
 import json
-import libkirara
+import uuid
 import logging
-logger = logging.getLogger('redraw')
+import random
+import libkirara
+
+logging.basicConfig(level=logging.DEBUG,
+                    format='[%(asctime)s][%(levelname)s][%(funcName)-2s]-> %(message)s',
+                    datefmt='%m-%d %H:%M:%S')
 
 def check_count(r: dict):
     cid_map = {
@@ -27,7 +32,7 @@ def check_count(r: dict):
         if type == 50:
             result_json["gold"] += 1
             CID.append(item["characterId"])
-            logger.info("CID: %d" % item["characterId"])
+            logging.info("CID: %d" % item["characterId"])
         if type == 40:
             result_json["silver"] += 1
         if type == 30:
@@ -42,11 +47,25 @@ def check_count(r: dict):
 kirara_api = libkirara.KiraraAPI()
 kirara_api.set_user_agent("Dalvik/1.6.0 (Linux; U; Android 4.4.2; GT-I9060C Build/KOT49H)")
 kirara_api.set_unity_user_agent("app/0.0.0; Android OS 4.4.2 / API-19 KOT49H/3.8.017.1018; samsung GT-I9060C")
-# load account from a.d
+# move get switch
+move_get_flag = False
+
+# login with a.d
 # kirara_api.load_account()
 # kirara_api.login(kirara_api.user_account["uuid"],kirara_api.user_account["accesstoken"])
-# using session id
-kirara_api.session_id = ""
+
+# login with uuid & accesstoken
+# kirara_api.login("","")
+
+# login with session id
+# kirara_api.session_id = ""
+
+# login with new account
+name = "きらら"
+uuid_a = str(uuid.uuid4())
+accesstoken_a = kirara_api.signup(uuid_a,name)
+kirara_api.login(uuid_a,accesstoken_a)
+move_get_flag = True
 
 kirara_api._make_request(
     "/api/player/gacha/draw", 
@@ -57,7 +76,15 @@ while True:
         "/api/player/gacha/draw", 
         {"gachaId":1,"drawType":3,"stepCode":4,"reDraw":False},True)
     try:
-        print(check_count(r))
+        result = check_count(r)
+        print(result)
+        if result["gold"] == 8:
+            break
     except KeyError:
         print("session invalid")
-    
+    time.sleep(1+random.uniform(1, 2))
+
+# new id move get
+if move_get_flag:
+    print("UUID: %s, TOKEN: %s" % (uuid_a,accesstoken_a))
+    print("MoveCode: %s" % kirara_api.move_get("kirara"))
