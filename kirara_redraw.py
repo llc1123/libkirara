@@ -43,48 +43,53 @@ def check_count(r: dict):
         print(crs)
     return result_json
 
+def redraw():
+    kirara_api = libkirara.KiraraAPI()
+    kirara_api.set_user_agent("Dalvik/1.6.0 (Linux; U; Android 4.4.2; GT-I9060C Build/KOT49H)")
+    kirara_api.set_unity_user_agent("app/0.0.0; Android OS 4.4.2 / API-19 KOT49H/3.8.017.1018; samsung GT-I9060C")
+    # move get switch
+    move_get_flag = False
 
-kirara_api = libkirara.KiraraAPI()
-kirara_api.set_user_agent("Dalvik/1.6.0 (Linux; U; Android 4.4.2; GT-I9060C Build/KOT49H)")
-kirara_api.set_unity_user_agent("app/0.0.0; Android OS 4.4.2 / API-19 KOT49H/3.8.017.1018; samsung GT-I9060C")
-# move get switch
-move_get_flag = False
+    # login with a.d
+    # kirara_api.load_account()
+    # kirara_api.login(kirara_api.user_account["uuid"],kirara_api.user_account["accesstoken"])
 
-# login with a.d
-# kirara_api.load_account()
-# kirara_api.login(kirara_api.user_account["uuid"],kirara_api.user_account["accesstoken"])
+    # login with uuid & accesstoken
+    # kirara_api.login("","")
 
-# login with uuid & accesstoken
-# kirara_api.login("","")
+    # login with session id
+    # kirara_api.session_id = ""
 
-# login with session id
-# kirara_api.session_id = ""
+    # login with new account
+    name = "きらら"
+    uuid_a = str(uuid.uuid4())
+    accesstoken_a = kirara_api.signup(uuid_a,name)
+    kirara_api.login(uuid_a,accesstoken_a)
+    move_get_flag = True
 
-# login with new account
-name = "きらら"
-uuid_a = str(uuid.uuid4())
-accesstoken_a = kirara_api.signup(uuid_a,name)
-kirara_api.login(uuid_a,accesstoken_a)
-move_get_flag = True
-
-kirara_api._make_request(
-    "/api/player/gacha/draw", 
-    {"gachaId":1,"drawType":3,"stepCode":0,"reDraw":True},True)
-
-while True:
-    r = kirara_api._make_request(
+    kirara_api._make_request(
         "/api/player/gacha/draw", 
-        {"gachaId":1,"drawType":3,"stepCode":4,"reDraw":False},True)
-    try:
-        result = check_count(r)
-        print(result)
-        if result["gold"] == 8:
-            break
-    except KeyError:
-        print("session invalid")
-    time.sleep(1+random.uniform(1, 2))
+        {"gachaId":1,"drawType":3,"stepCode":0,"reDraw":True},True)
 
-print("UUID: %s, TOKEN: %s" % (uuid_a,accesstoken_a))
-# new id move get
-if move_get_flag:
-    print("MoveCode: %s" % kirara_api.move_get("kirara"))
+    while True:
+        r = kirara_api._make_request(
+            "/api/player/gacha/draw", 
+            {"gachaId":1,"drawType":3,"stepCode":4,"reDraw":False},True)
+        try:
+            result = check_count(r)
+            print(result)
+            if result["gold"] == 8:
+                break
+        except KeyError:
+            print("session invalid")
+        time.sleep(1+random.uniform(1, 2))
+
+    print("UUID: %s, TOKEN: %s" % (uuid_a,accesstoken_a))
+    # new id move get
+    if move_get_flag:
+        print("MoveCode: %s" % kirara_api.move_get("kirara"))
+
+    return kirara_api
+
+if __name__ == "__main__":
+    redraw()
