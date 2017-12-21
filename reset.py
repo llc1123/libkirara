@@ -2,20 +2,24 @@ import libkirara
 
 api = libkirara.KiraraAPI()
 
-for __ in range(300):
-	
+while True:
+
 	api.getVersion()
 	api.signUp()
 	api.login()
 	api.miscFirstLogin()
 	api.gachaLoop()
 
+	daily = 20
 	other = 20
-	f5 = 5
+	f5 = 20
 
 	api.mission_refresh()
-	api.mission_completeDaily()
-	api.mission_completeWeekly()
+
+	for i in range(daily):
+		api.mission_completeDaily()
+		api.mission_completeWeekly()
+		print('Daily and weekly missions routine progress...' + str(i+1) + '/' + str(other))
 
 	for i in range(other):
 		api.mission_refresh()
@@ -33,6 +37,8 @@ for __ in range(300):
 	print('Fucking Kirara for gems...Complete.')
 
 	api.gachaChrist()
+
+	api.dropAll()
 
 	f = open('output.txt', 'a')
 	f.write(api.uuid + ',' + api.accessToken + '\n')
