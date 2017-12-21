@@ -27,6 +27,7 @@ class KiraraAPI:
     uuid = ''
     sessionId = ''
     accessToken = ''
+    moveCode = ''
 
     def loadAccount(self, path="a.d"):
 
@@ -201,7 +202,8 @@ class KiraraAPI:
         print('Generating moving code...', end = '')
         result = self.sendPost('/api/player/move/get', {'password':'1234'})
         print('Complete.')
-        print('Moving Code: ' + json.loads(result.content)['moveCode'])
+        self.moveCode = json.loads(result.content)['moveCode']
+        print('Moving Code: ' + self.moveCode)
         print('Password: 1234')
 
 

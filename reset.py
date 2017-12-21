@@ -41,5 +41,5 @@ while True:
 	api.dropAll()
 
 	f = open('output.txt', 'a')
-	f.write(api.uuid + ',' + api.accessToken + '\n')
+	f.write(api.uuid + ',' + api.accessToken + ',' + api.moveCode + ',1234\n')
 	f.close()
