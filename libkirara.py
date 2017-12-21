@@ -159,7 +159,7 @@ class KiraraAPI:
         self._assert_result(result)
         return result
 
-    def present_get(self, present_dict):
+    def present_get(self, present_dict={}):
         resultStr = self._make_request('/api/player/present/get_all', present_dict, False)
         logger.info(str(resultStr))
         result = json.loads(resultStr)

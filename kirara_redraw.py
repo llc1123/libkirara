@@ -1,4 +1,4 @@
-import time
+﻿import time
 import json
 import uuid
 import logging
@@ -65,7 +65,7 @@ def redraw():
     uuid_a = str(uuid.uuid4())
     accesstoken_a = kirara_api.signup(uuid_a,name)
     kirara_api.login(uuid_a,accesstoken_a)
-    kirara_api.present_get()
+    kirara_api.present_get_all()
     move_get_flag = True
 
     #kirara_api._make_request(
