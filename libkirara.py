@@ -104,7 +104,7 @@ class KiraraAPI:
 
     def getVersion(self):
         print('Checking version...', end = '')
-        result = self.sendGet('/api/app/version/get', {'platform': '2', 'version': '1.0.3'})
+        result = self.sendGet('/api/app/version/get', {'platform': '2', 'version': '1.0.4'})
         if result.ok:
             if json.loads(result.content)['resultCode'] == 0:
                 print('OK.')
@@ -136,7 +136,7 @@ class KiraraAPI:
 
     def login(self):
         print('Logging in...', end = '')
-        result = self.sendPost('/api/player/login', {"uuid":self.uuid,"accessToken":self.accessToken,"platform":2,"appVersion":"1.0.3"})
+        result = self.sendPost('/api/player/login', {"uuid":self.uuid,"accessToken":self.accessToken,"platform":2,"appVersion":"1.0.4"})
         if result.ok:
             if json.loads(result.content)['resultCode'] == 0:
                 self.sessionId = json.loads(result.content)['sessionId']
@@ -156,9 +156,9 @@ class KiraraAPI:
         self.sendGet('/api/player/quest/get_all', '')
         self.sendGet('/api/quest_chapter/get_all', '')
         self.sendGet('/api/player/mission/get_all', '')
-        result = self.sendGet('/api/player/present/get_all', '')
+        result = json.loads(self.sendGet('/api/player/present/get_all', '').content)
         present = []
-        for item in json.loads(result.content)['presents']:
+        for item in result['presents']:
             present.append(item['managedPresentId'])
         self.sendGet('/api/player/present/get', {'managedPresentId':','.join(str(x) for x in present), 'stepCode': 2})
         self.sendPost('/api/player/adv/add', {'advId':'1000000','stepCode':3})
@@ -168,22 +168,12 @@ class KiraraAPI:
     def gachaLoop(self):
         cards = 0
         attemps = 0
-        while cards < 116:
+        # while cards < 116:
+        for __ in range(2000):
             result = json.loads(self.sendPost('/api/player/gacha/draw', {"gachaId":1,"drawType":3,"stepCode":4,"reDraw":False}).content)
             cards = len(result['managedCharacters'])
             attemps += 1
             print('Drawing Init Gacha...Attempts: ' + str(attemps) + ', Current Cards: ' + str(cards), end = '\r')
-        print()
-
-    def gachaChrist(self):
-        self.sendGet('/api/player/gacha/get_all', {'gachaIds':''})
-        cards = 0
-        attemps = 0
-        while cards < 120:
-            result = json.loads(self.sendPost('/api/player/gacha/draw', {"gachaId":3,"drawType":3,"stepCode":0,"reDraw":False}).content)
-            cards = len(result['managedCharacters'])
-            attemps += 1
-            print('Drawing Christmas Limited Gacha...Attempts: ' + str(attemps) + ', Current Cards: ' + str(cards), end = '\r')
         print()
 
     def fetchPresents(self):
@@ -209,11 +199,10 @@ class KiraraAPI:
 
     daily = range(1,6)
     weekly = range(1000,1006)
-    f5 = 40015
+    rank = 10000
 
     dailySet = {'missionLogs':[]}
     weeklySet = {'missionLogs':[]}
-    f5Set = {'missionLogs':[]}
     otherSet = {'missionLogs':[]}
 
     def mission_refresh(self):
@@ -221,7 +210,6 @@ class KiraraAPI:
         result = json.loads(self.sendGet('/api/player/mission/get_all','').content)['missionLogs']
         self.dailySet = {'missionLogs':[]}
         self.weeklySet = {'missionLogs':[]}
-        self.f5Set = {'missionLogs':[]}
         self.otherSet = {'missionLogs':[]}
         for i in result:
             item = {"managedMissionId":i['managedMissionId'], "missionId":i['missionId'], "subCode":i['subCode'], "rate":i['rate'], "rateMax":i['rateMax'], "state":i['state'], "reward":None, "limitTime":i['limitTime']}
@@ -229,17 +217,15 @@ class KiraraAPI:
                 self.dailySet['missionLogs'].append(item)
             elif item['missionId'] in self.weekly:
                 self.weeklySet['missionLogs'].append(item)
-            elif item['missionId'] == self.f5:
-                self.f5Set['missionLogs'].append(item)
-            else:
+            elif item['missionId'] != self.rank:
                 self.otherSet['missionLogs'].append(item)
         print('Complete.')
 
     def mission_complete(self, missionList):
-        self.sendPost('/api/player/mission/set', missionList)
 
         for i in missionList['missionLogs']:
             self.sendPost('/api/player/mission/complete', {'managedMissionId':i['managedMissionId']})
+
 
     def mission_reset(self, missionList):
         self.sendPost('/api/player/mission/set', missionList)
@@ -254,12 +240,6 @@ class KiraraAPI:
         self.mission_complete(self.weeklySet)
         print('Complete.')
 
-    def mission_completeF5(self):
-        print('Completing friendliness-5 missions...', end = '')
-        self.mission_complete(self.f5Set)
-        self.mission_reset(self.f5Set)
-        print('Complete.')
-
     def mission_completeOther(self):
         print('Completing Other missions...', end = '')
         self.mission_complete(self.otherSet)
@@ -271,25 +251,26 @@ class KiraraAPI:
         orderReceiveId = json.loads(r.content)['orderReceiveId']
         dropItems = '1:999,2:999,3:999,4:999,5:999,6:999,7:999,8:999,9:999,10:999,' + \
                     '11:999,12:999,13:999,14:999,15:999,16:999,17:999,18:999,19:999,20:999,21:999,' + \
-                    '1000:999,1001:999,1002:999,1003:999,1004:999,' + \
                     '2000:999,2001:999,2002:999,2003:999,2004:999,2005:999,2006:999,2007:999,2008:999,2009:999,2010:999,' + \
                     '2011:999,2012:999,2013:999,2014:999,2015:999,2016:999,2017:999,2018:999,2019:999,2020:999,2021:999,' + \
                     '2022:999,2023:999,' + \
                     '3000:999,3001:999,3002:999,3003:999,3004:999,3005:999,3006:999,3007:999,' + \
-                    '4000:999,4001:999,4002:999,4003:999,4004:999,4005:999,4006:999,4007:999,4008:999,4009:999,4010:999,' + \
-                    '4011:999,4012:999,4013:999,4014:999,' + \
-                    '5000:999,5001:999,5002:999,5003:999,5004:999,5005:999,5006:999,5007:999,' + \
+                    '4000:999,4001:999,4002:999,4003:999,4004:999,4005:999,4006:999,4007:999,4008:999,4009:999,' + \
                     '6000:999,6001:999,6002:999,6003:999,6004:999,6005:999,6006:999,6007:999,6008:999,6009:999,6010:999,' + \
                     '6011:999,6012:999,6013:999,6014:999,6015:999,6016:999,6017:999,6018:999,6019:999,6020:999,6021:999,' + \
                     '6022:999,6023:999,6024:999,6025:999,6026:999,6027:999,6028:999,6029:999,' + \
                     '7000:999,7001:999,7002:999,7003:999,7004:999,7005:999,7006:999,7007:999,7008:999,7009:999,7010:999,' + \
                     '7011:999,7012:999,7013:999,7014:999,' + \
-                    '8000:999,8001:999,8002:999,8003:999,8004:999,8005:999,8006:999,8007:999,' + \
+                    '8000:999,8001:999,8002:999,8003:999,8004:999,8005:999,8006:999,8007:999'
+
+        ggList =    '1000:999,1001:999,1002:999,1003:999,1004:999,' + \
+                    '4010:999,4011:999,4012:999,4013:999,4014:999,' + \
+                    '5000:999,5001:999,5002:999,5003:999,5004:999,5005:999,5006:999,5007:999,' + \
                     '9000:999,' + \
                     '10000:999,10001:999,' + \
                     '100100:999,100101:999,100102:999,100103:999,100104:999'
 
-        self.sendPost('/api/player/quest_log/set', {
+        r = self.sendPost('/api/player/quest_log/set', {
             'clearRank': 3,
             'dropItems': dropItems,
             'friendUseNum': 0,
